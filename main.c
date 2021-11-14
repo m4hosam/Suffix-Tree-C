@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAX 8
+#define MAX 11
 
 typedef struct TreeNodes
 {
@@ -182,14 +182,14 @@ void BuildSuffixTree(char *text)
     struct TreeNodes *root = createNode("$root$", 0, -1);
     int idx, index;
 
-    root->branches[0] = createNode(text, 0, 0);
-    root->children = (root->children) + 1;
+    // root->branches[0] = createNode((text - length - 1), 0, 0);
+    // root->children = (root->children) + 1;
 
-    for (int i = 1; i < length; i++)
+    for (int i = length - 1; i > -1; i--)
     {
         idx = 0;
         struct TreeNodes *searchedNode = searchTree(root, text + i, &idx);
-
+        printf("modified i(%d) idx(%d): %s\n", i, idx, searchedNode->data);
         if (idx == 0) // Returned root append directly
         {
 
@@ -200,32 +200,19 @@ void BuildSuffixTree(char *text)
         {
             if (searchedNode->children == 0)
             {
-                // printf("modified i(%d) idx(%d): %s\n", i, idx, searchedNode->data);
+                int diff = strlen(text + (searchedNode->index)) - strlen(searchedNode->data);
 
-                index = StringCmp(searchedNode->data, text + i);
-                // printf("index:%d\n", index);
+                index = StringCmp(text + (searchedNode->index), text + i);
 
                 char subString1[MAX][20], subString2[MAX][20];
-                // printf("text: %s\n", text + index);
 
-                subString((searchedNode->data), subString1[i], subString2[i], index);
+                subString((searchedNode->data), subString1[i], subString2[i], index - diff);
 
-                // printf("i: %d text + index: %s\n", i, text + i + index);
-                // printf("xa11 i(%d) idx(%d): %s\n", i, idx, root->branches[0]->data);
                 searchedNode->branches[0] = createNode(text + i + index, 0, i);
 
                 searchedNode->branches[1] = createNode(subString2[i], 0, searchedNode->index);
 
-                // printf("xa11 i(%d) idx(%d): %s\n", i, idx, root->branches[0]->data);
-                // printf("--------\ni(%d)subString: 1.%s    2.%s\n---------\n", i, subString1[i], subString2[i]);
                 searchedNode = modifyNode(searchedNode, &subString1[i], 2, -1);
-                // printf("data: %s\n", searchedNode->data);
-                // printf("--------\n22subString: 1.%s    2.%s\n---------\n", subString1[i], subString2[i]);
-                // searchedNode->index = -1;
-                // searchedNode->children = 2;
-
-                // (*searchedNode).data[index] = '\0';
-                // printf("xa22 i(%d) idx(%d): %s\n", i, idx, root->branches[0]->data);
             }
             else
             {
@@ -237,27 +224,22 @@ void BuildSuffixTree(char *text)
         }
     }
     printTree(root);
+    // printf("---------------------------------------------------\n");
+    // printNode(root->branches[1]->branches[0]->branches[0]);
+    // printNode(root->branches[1]->branches[0]->branches[1]);
 }
-// void StringCpy(char *data, char *cpy)
-// {
-//     int length = strlen(cpy);
-//     for (int i = 0; i < length; i++)
-//     {
-//         data[i] = cpy[i];
-//     }
-//     data[length] = '\0';
-// }
 
 int main()
 {
     // char *tmp = "ssssss";
     char *text = "xaxaxaxa$";
+    // int length = strlen(text);
     // char *data = "ss";
     // strcpy(&data, &text);
     // printf("data: %s\n", data);
-    // printf("text: %s\n", text);
+    // printf("text: %s\n", text + length - 1);
     // strcpy(&text, &tmp);
-    // printf("data: %s\n", data);
+    //printf("data: %s\n", text + 3);
     // printf("text: %s\n", text);
     // char subString1[20], subString2[20];
     // subString(text, subString1, subString2, 2);
